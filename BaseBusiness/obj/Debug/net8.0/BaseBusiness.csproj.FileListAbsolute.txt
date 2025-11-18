@@ -1,0 +1,13 @@
+D:\NET_MVC\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.deps.json
+D:\NET_MVC\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.dll
+D:\NET_MVC\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.pdb
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.csproj.AssemblyReference.cache
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.GeneratedMSBuildEditorConfig.editorconfig
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.AssemblyInfoInputs.cache
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.AssemblyInfo.cs
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.csproj.CoreCompileInputs.cache
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.sourcelink.json
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.dll
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\refint\BaseBusiness.dll
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.pdb
+D:\NET_MVC\WebApp\BaseBusiness\obj\Debug\net8.0\ref\BaseBusiness.dll
