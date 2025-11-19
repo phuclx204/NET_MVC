@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("categories")]
-    public class CategoryModel
+    public class CategoryModel : BaseModel
     {
-        [Key]
-        public long Id { get; set; }
-
-        [Required, MaxLength(100)]
+        [Column("name")]
         public string Name { get; set; }
 
         public long? ParentId { get; set; }
@@ -19,7 +17,5 @@ namespace BaseBusiness.Model
         public CategoryModel Parent { get; set; }
 
         public ICollection<CategoryModel> Children { get; set; }
-
-        public byte Status { get; set; } = 1;
     }
 }
