@@ -1,0 +1,117 @@
+﻿@{
+    long id = ViewBag.Id;
+    bool isEdit = id > 0;
+    ViewData["Title"] = isEdit ? "Cập nhật Màu sắc" : "Thêm mới Màu sắc";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@AppRoutes.Home">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a href="@AppRoutes.Color">Màu sắc</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@(isEdit ? "Cập nhật" : "Thêm mới")</li>
+    </ol>
+</nav>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-purple-gradient text-white">
+        <h5 class="mb-0">
+            <i class="@(isEdit ? "fa-solid fa-pen-to-square" : "fa-solid fa-plus")"></i>
+            @ViewData["Title"]
+        </h5>
+    </div>
+    <div class="card-body">
+        <form id="frmSave">
+            <input type="hidden" id="HiddenId" value="@id" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tên màu <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="txtName" placeholder="Nhập tên màu..." required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Mã màu (Hex) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="color" class="form-control form-control-color" id="txtCode" value="#000000" title="Chọn màu">
+                        <input type="text" class="form-control" id="txtCodeText" value="#000000" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
+                <a href="/color" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Quay lại
+                </a>
+                <button type="button" onclick="saveData()" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> Lưu dữ liệu
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var id = $('#HiddenId').val();
+
+            if (id > 0) {
+                loadDetail(id);
+            }
+
+            $('#txtCode').on('input', function() {
+                $('#txtCodeText').val($(this).val());
+            });
+        });
+
+        function loadDetail(id) {
+            $.ajax({
+                url: `/color/detail/${id}`, 
+                type: 'GET',
+                success: function (res) {
+                    if (res.success) {
+                        var item = res.data;
+                        $('#txtName').val(item.name);
+                        $('#txtCode').val(item.code);
+                        $('#txtCodeText').val(item.code);
+                    } else {
+                        toastr.error(res.message);
+                    }
+                }
+            });
+        }
+
+        function saveData() {
+            if (!$('#txtName').val()) {
+                toastr.warning("Vui lòng nhập tên màu");
+                return;
+            }
+
+            var obj = {
+                Id: $('#HiddenId').val(),
+                Name: $('#txtName').val(),
+                Code: $('#txtCode').val()
+            };
+
+            $.ajax({
+                url: '/color/save',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(obj),
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success(res.message);
+                        setTimeout(function() {
+                            window.location.href = '/color';
+                        }, 1000);
+                    } else {
+                        toastr.error(res.message);
+                    }
+                },
+                error: function () {
+                    toastr.error('Có lỗi xảy ra!');
+                }
+            });
+        }
+    </script>
+}

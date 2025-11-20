@@ -1,0 +1,16 @@
+D:\NET_MVC\WebApp\CSM\bin\Debug\net8.0\CSM.deps.json
+D:\NET_MVC\WebApp\CSM\bin\Debug\net8.0\CSM.dll
+D:\NET_MVC\WebApp\CSM\bin\Debug\net8.0\CSM.pdb
+D:\NET_MVC\WebApp\CSM\bin\Debug\net8.0\BaseBusiness.dll
+D:\NET_MVC\WebApp\CSM\bin\Debug\net8.0\BaseBusiness.pdb
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.csproj.AssemblyReference.cache
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.GeneratedMSBuildEditorConfig.editorconfig
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.AssemblyInfoInputs.cache
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.AssemblyInfo.cs
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.csproj.CoreCompileInputs.cache
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.sourcelink.json
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.csproj.Up2Date
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.dll
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\refint\CSM.dll
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\CSM.pdb
+D:\NET_MVC\WebApp\CSM\obj\Debug\net8.0\ref\CSM.dll

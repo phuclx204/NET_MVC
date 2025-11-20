@@ -1,0 +1,16 @@
+D:\NET_MVC\WebApp\SystemApp\bin\Debug\net8.0\SystemApp.deps.json
+D:\NET_MVC\WebApp\SystemApp\bin\Debug\net8.0\SystemApp.dll
+D:\NET_MVC\WebApp\SystemApp\bin\Debug\net8.0\SystemApp.pdb
+D:\NET_MVC\WebApp\SystemApp\bin\Debug\net8.0\BaseBusiness.dll
+D:\NET_MVC\WebApp\SystemApp\bin\Debug\net8.0\BaseBusiness.pdb
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.csproj.AssemblyReference.cache
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.GeneratedMSBuildEditorConfig.editorconfig
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.AssemblyInfoInputs.cache
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.AssemblyInfo.cs
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.csproj.CoreCompileInputs.cache
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.sourcelink.json
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.csproj.Up2Date
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.dll
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\refint\SystemApp.dll
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\SystemApp.pdb
+D:\NET_MVC\WebApp\SystemApp\obj\Debug\net8.0\ref\SystemApp.dll
