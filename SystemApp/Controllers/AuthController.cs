@@ -9,11 +9,9 @@ using System.Threading.Tasks;
 
 namespace SystemApp.Controllers
 {
-    [Route("employee")]
-    public class EmployeeController : Controller
+    [Route("auth")]
+    public class AuthController : Controller
     {
-
-
         public IActionResult Index()
         {
             return View();

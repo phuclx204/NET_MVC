@@ -1,19 +1,19 @@
-﻿using Modules.Catalog.Services;
-using Modules.Inventory.Services;
-using Modules.CSM.Services;
-using Modules.SystemApp.Services;
-
-using Catalog.Controllers;
-using Inventory.Controllers;
-using CSM.Controllers;
-using SystemApp.Controllers;
-
-using Catalog.Services.Interfaces;
-using CSM.Services.Interfaces;
-using Inventory.Services.Interfaces;
-using SystemApp.Services.Interfaces;
-
+﻿using System.Text;
 using BaseBusiness.util;
+using Catalog.Controllers;
+using Catalog.Services.Interfaces;
+using CSM.Controllers;
+using CSM.Services.Interfaces;
+using Inventory.Controllers;
+using Inventory.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Modules.Catalog.Services;
+using Modules.CSM.Services;
+using Modules.Inventory.Services;
+using Modules.SystemApp.Services;
+using SystemApp.Controllers;
+using SystemApp.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +44,29 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 
+// --- Cấu hình JWT ---
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
 var app = builder.Build();
 
 app.MapGet("/", () => Results.Redirect("/home"));
@@ -55,6 +78,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
