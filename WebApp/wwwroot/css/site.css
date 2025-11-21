@@ -1,22 +1,76 @@
-html {
-  font-size: 14px;
+﻿/* 1. Ghi đè biến màu mặc định của Bootstrap (Blue -> Purple) */
+:root {
+    /* Mã màu tím chuẩn Bootstrap: #6f42c1 */
+    --bs-primary: #6f42c1;
+    --bs-primary-rgb: 111, 66, 193;
+    /* Màu khi hover (đậm hơn chút) */
+    --bs-primary-hover: #59359a;
+    /* Màu link */
+    --bs-link-color: #6f42c1;
+    --bs-link-hover-color: #59359a;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+/* 2. Class nền tím gradient (Dùng cho Navbar) */
+.bg-purple-gradient {
+    background: linear-gradient(45deg, #6f42c1, #a66efa);
+    color: white;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* 3. Tinh chỉnh Sidebar */
+#sidebarMenu {
+    background-color: #f8f9fa; /* Nền xám nhẹ */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* Link trong Sidebar bình thường */
+.sidebar .nav-link {
+    color: #333;
+    font-weight: 500;
+    border-radius: 5px;
+    margin-bottom: 2px;
+    transition: all 0.3s;
 }
 
-body {
-  margin-bottom: 60px;
+    /* Link khi di chuột vào */
+    .sidebar .nav-link:hover {
+        background-color: rgba(111, 66, 193, 0.1); /* Tím nhạt 10% */
+        color: #6f42c1;
+    }
+
+    /* Link đang Active (Đang chọn) */
+    .sidebar .nav-link.active {
+        background-color: rgba(111, 66, 193, 0.15); /* Tím nhạt 15% */
+        color: #6f42c1;
+        font-weight: bold;
+        border-left: 4px solid #6f42c1; /* Vạch kẻ tím bên trái */
+    }
+
+    /* Icon trong sidebar */
+    .sidebar .nav-link i {
+        width: 24px;
+        text-align: center;
+    }
+
+/* 4. Nút bấm: Tự động đẹp, nhưng thêm chút bóng đổ cho xịn */
+.btn-primary {
+    background-color: #6f42c1 !important;
+    border-color: #6f42c1 !important;
+}
+
+    .btn-primary:hover {
+        background-color: #5a35a5 !important;
+        border-color: #5a35a5 !important;
+        transform: translateY(-1px);
+    }
+
+.breadcrumb a {
+    text-decoration: none !important;
+    color: #6f42c1;
+}
+
+.sidebar .nav-link.active {
+    background-color: #e9ecef; /* nền sáng */
+    font-weight: 600; /* đậm chữ */
+    border-left: 3px solid #6f42c1; /* line tím bên trái */
+    color: #6f42c1 !important; /* đổi màu chữ */
 }

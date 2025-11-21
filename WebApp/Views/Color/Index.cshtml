@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = PageTitles.Color;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@AppRoutes.Home">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@PageTitles.Color</li>
+    </ol>
+</nav>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">@PageTitles.Color</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/color/form" class="btn btn-primary btn-sm">
+            <i class="fa fa-plus"></i> Thêm mới
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Tên màu</th>
+                <th>Mã màu</th>
+                <th>Ngày tạo</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="tblData">
+        </tbody>
+    </table>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+             loadData();
+        });
+
+        function loadData() {
+            $.ajax({
+                url: '/color/get-all', 
+                type: 'GET',
+                success: function (res) {
+                    if (res.success) {
+                        var html = '';
+                        $.each(res.data, function (i, item) {
+                            html += `<tr>
+                                        <td>${item.name}</td>
+                                        <td>
+                                            <span class="badge rounded" style="background-color:${item.code}; color: #fff; text-shadow: 1px 1px 1px #000;">${item.code}</span>
+                                        </td>
+                                        <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                                        <td>
+                                            <a href="/color/form?id=${item.id}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger ms-1" onclick="deleteData(${item.id})">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                     </tr>`;
+                        });
+                        $('#tblData').html(html);
+                    }
+                }
+            });
+        }
+
+        function deleteData(id) {
+            Swal.fire({
+                title: "Bạn có chắc chắn?",
+                text: "Màu sắc sẽ bị xóa!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Xóa",
+                cancelButtonText: "Hủy",
+                customClass: {
+                    confirmButton: 'btn btn-danger me-2',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/color/delete/${id}`,
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (res) {
+                            if (res.success) {
+                                toastr.success("Xóa thành công!");
+                                loadData();
+                            } else {
+                                toastr.error(res.message);
+                            }
+                        },
+                        error: function () {
+                            toastr.error("Có lỗi xảy ra khi xóa!");
+                        }
+                    });
+                }
+            });
+        }
+
+    </script>
+}

@@ -1,0 +1,16 @@
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.csproj.AssemblyReference.cache
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.GeneratedMSBuildEditorConfig.editorconfig
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.AssemblyInfoInputs.cache
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.AssemblyInfo.cs
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.csproj.CoreCompileInputs.cache
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.sourcelink.json
+D:\NET_MVC\WebApp\Inventory\bin\Debug\net8.0\Inventory.deps.json
+D:\NET_MVC\WebApp\Inventory\bin\Debug\net8.0\Inventory.dll
+D:\NET_MVC\WebApp\Inventory\bin\Debug\net8.0\Inventory.pdb
+D:\NET_MVC\WebApp\Inventory\bin\Debug\net8.0\BaseBusiness.dll
+D:\NET_MVC\WebApp\Inventory\bin\Debug\net8.0\BaseBusiness.pdb
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.csproj.Up2Date
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.dll
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\refint\Inventory.dll
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\Inventory.pdb
+D:\NET_MVC\WebApp\Inventory\obj\Debug\net8.0\ref\Inventory.dll

@@ -1,49 +1,183 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - WebApp</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Sales Inventory</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-purple-gradient fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fa-solid fa-boxes-stacked"></i> QUẢN LÝ KHO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fa fa-user"></i> Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><span><i class="fa-solid fa-wrench me-2"></i> Cài đặt</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><span><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng xuất</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="position: fixed; top: 56px; bottom: 0; overflow-y: auto; padding-top: 20px; border-right: 1px solid #ddd;">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+
+                        <li class="nav-item mb-2">
+                            <a class="nav-link d-flex justify-content-between align-items-center @IsActive(AppRoutes.Home)" href="@AppRoutes.Home">
+                                <span><i class="fa-solid fa-home me-2"></i> Trang chủ</span>
+                            </a>
+                            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuCatalog" role="button" aria-expanded="false">
+                                <span><i class="fa-solid fa-layer-group me-2"></i> Quản lý SP</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                            </a>
+                            <div class="collapse show" id="menuCatalog">
+                                <ul class="list-unstyled ms-3 border-start border-2 ps-2">
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Products) " href="@AppRoutes.Products">
+                                            Sản phẩm
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Color)" href="@AppRoutes.Color">
+                                            Màu sắc
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Size)" href="@AppRoutes.Size">
+                                            Kích thước
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Category) " href="@AppRoutes.Category">
+                                            Danh mục
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Brand)" href="@AppRoutes.Brand">
+                                            Thương hiệu
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                        <li class="nav-item mb-2">
+                            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuInventory" role="button" aria-expanded="false">
+                                <span><i class="fa-solid fa-warehouse me-2"></i> Quản lý kho</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                            </a>
+                            <div class="collapse" id="menuInventory">
+                                <ul class="list-unstyled ms-3 border-start border-2 ps-2">
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Supplier)" href="@AppRoutes.Supplier">
+                                            Nhà cung cấp
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.StockIn)" href="@AppRoutes.StockIn">
+                                            Nhập kho
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item mb-2">
+                            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuSales" role="button" aria-expanded="false">
+                                <span><i class="fa-solid fa-cart-shopping me-2"></i> Bán hàng</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                            </a>
+                            <div class="collapse" id="menuSales">
+                                <ul class="list-unstyled ms-3 border-start border-2 ps-2">
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Pos)" href="@AppRoutes.Pos">
+                                            POS
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Customer)" href="@AppRoutes.Customer">
+                                            Khách hàng
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @IsActive(AppRoutes.Voucher)" href="@AppRoutes.Voucher">
+                                            Khuyến mãi
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item mb-2">
+                            <a class="nav-link @IsActive(AppRoutes.Employee)" href="@AppRoutes.Employee">
+                                Nhân viên
+                            </a>
                         </li>
                     </ul>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+            </nav>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - WebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="margin-top: 60px;">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+    @functions {
+        string IsActive(string href)
+        {
+            var current = Context.Request.Path.Value?.ToLower() ?? "";
+            href = href.ToLower();
+
+            return current == href ? "active" : "";
+        }
+    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        // Cấu hình Toastr dùng chung cho toàn bộ Web
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+             
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
