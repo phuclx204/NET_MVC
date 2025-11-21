@@ -1,3 +1,16 @@
+D:\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.deps.json
+D:\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.dll
+D:\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.pdb
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.csproj.AssemblyReference.cache
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.GeneratedMSBuildEditorConfig.editorconfig
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.AssemblyInfoInputs.cache
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.AssemblyInfo.cs
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.csproj.CoreCompileInputs.cache
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.sourcelink.json
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.dll
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\refint\BaseBusiness.dll
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\BaseBusiness.pdb
+D:\WebApp\BaseBusiness\obj\Debug\net8.0\ref\BaseBusiness.dll
 D:\NET_MVC\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.deps.json
 D:\NET_MVC\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.dll
 D:\NET_MVC\WebApp\BaseBusiness\bin\Debug\net8.0\BaseBusiness.pdb

@@ -1,91 +1,116 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations.Schema; 
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace BaseBusiness.util
 {
     public class DBUtils
     {
-        private static string ConnectionString = "Server=.;Database=SaleInventoryDB;User=sa;Password=123456;Trusted_Connection=True;Encrypt=False;";
-
-        public static DataTable GetList(string sql)
-        {
-
-            // Tạo bảng để chứa dữ liệu
-            DataTable dt = new DataTable();
-
-            // Tạo đường nối đến cơ sở dữ liệu
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
-            {
-                conn.Open();
-
-                // tạo query để gửi đi
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                    // Adapter lấy dữ liệu từ database đổ vào bảng dt
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
-                    {
-                        adapter.Fill(dt); // đổ dữ liệu vào bảng dt
-                    }
-                }
-            }
-            return dt;
-        }
-
+        // Property để lấy chuỗi kết nối (Đọc 1 lần duy nhất khi ứng dụng chạy)
+        public static string ConnectionString { get; set; }
+      
+        /// <summary>
+        /// Hàm dùng để Lấy danh sách (SELECT) và map vào List Model
+        /// </summary>
         public static List<T> GetList<T>(string sql, SqlParameter[] parameters = null) where T : new()
         {
-            DataTable dt = new DataTable();
+            List<T> list = new List<T>();
 
             using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
-                    // Nếu có tham số truyền vào thì nạp vào Command
-                    if (parameters != null && parameters.Length > 0)
-                    {
-                        cmd.Parameters.AddRange(parameters);
-                    }
+                    if (parameters != null) cmd.Parameters.AddRange(parameters);
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
                     {
+                        DataTable dt = new DataTable();
                         adapter.Fill(dt);
+
+                        // Lấy thông tin Property một lần để tối ưu hiệu năng
+                        PropertyInfo[] properties = typeof(T).GetProperties();
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            T item = new T();
+                            foreach (PropertyInfo prop in properties)
+                            {
+                                // 1. Xác định tên cột trong DB dựa vào Attribute [Column("name")] hoặc tên Property
+                                string dbColumnName = prop.Name;
+                                var colAttr = prop.GetCustomAttribute<ColumnAttribute>();
+                                if (colAttr != null) dbColumnName = colAttr.Name;
+
+                                // 2. Map dữ liệu
+                                if (dt.Columns.Contains(dbColumnName) && row[dbColumnName] != DBNull.Value)
+                                {
+                                    try
+                                    {
+                                        object dbValue = row[dbColumnName];
+
+                                        Type t = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+
+                                        object safeValue = Convert.ChangeType(dbValue, t);
+                                        prop.SetValue(item, safeValue);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Lỗi map cột {dbColumnName}: {ex.Message}");
+                                    }
+                                }
+                            }
+                            list.Add(item);
+                        }
                     }
                 }
             }
-
-            // 2. Chuyển đổi (Map) từ DataTable sang List<T> bằng Reflection
-            List<T> list = new List<T>();
-
-            // Lấy danh sách các thuộc tính (cột) của class Model
-            PropertyInfo[] properties = typeof(T).GetProperties();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                T item = new T();
-                foreach (PropertyInfo prop in properties)
-                {
-                    // Kiểm tra: Nếu trong bảng DB có cột trùng tên với Property VÀ giá trị không rỗng
-                    if (dt.Columns.Contains(prop.Name) && row[prop.Name] != DBNull.Value)
-                    {
-                        try
-                        {
-                            // Chuyển đổi giá trị từ DB sang kiểu dữ liệu của Property (ví dụ: int, string, decimal)
-                            object value = row[prop.Name];
-                            prop.SetValue(item, Convert.ChangeType(value, prop.PropertyType));
-                        }
-                        catch
-                        {
-                            // Nếu lỗi chuyển đổi kiểu (ví dụ DB là null mà Model không cho null) thì bỏ qua
-                            // Trong thực tế nên log lỗi này lại
-                        }
-                    }
-                }
-                list.Add(item);
-            }
-
             return list;
+        }
+
+        /// <summary>
+        /// Hàm lấy 1 đối tượng duy nhất (SELECT Single)
+        /// </summary>
+        public static T GetItem<T>(string sql, SqlParameter[] parameters = null) where T : new()
+        {
+            var list = GetList<T>(sql, parameters);
+            return list.Count > 0 ? list[0] : default(T);
+        }
+
+        /// <summary>
+        /// Hàm thực thi Insert, Update, Delete
+        /// Trả về số dòng bị ảnh hưởng
+        /// </summary>
+        public static int ExecuteNonQuery(string sql, SqlParameter[] parameters)
+        {
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    if (parameters != null) cmd.Parameters.AddRange(parameters);
+                    return cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Hàm thực thi lấy về 1 giá trị đơn (ví dụ: SELECT COUNT(*), hoặc SELECT SCOPE_IDENTITY())
+        /// </summary>
+        public static object ExecuteScalar(string sql, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    if (parameters != null) cmd.Parameters.AddRange(parameters);
+                    return cmd.ExecuteScalar();
+                }
+            }
         }
     }
 }
