@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("stock_in_detail")]
-    public class StockInDetailModel
+    public class StockInDetailModel : BaseModel
     {
-        [Key]
-        public long Id { get; set; }
-
         public long StockInId { get; set; }
         [ForeignKey("StockInId")]
         public StockInModel StockIn { get; set; }

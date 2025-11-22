@@ -1,16 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("vouchers")]
-    public class VoucherModel
+    public class VoucherModel : BaseModel
     {
-        [Key]
-        [Column("id")]
-        public long Id { get; set; }
-
         [Column("code")]
         [StringLength(50)]
         public string Code { get; set; }
@@ -21,7 +18,7 @@ namespace BaseBusiness.Model
 
         [Column("discount_type")]
         [StringLength(10)]
-        public string DiscountType { get; set; } // "tongtien" hoặc "phantram"
+        public string DiscountType { get; set; }
 
         [Column("discount_value")]
         public decimal? DiscountValue { get; set; }
