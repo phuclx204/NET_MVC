@@ -7,9 +7,6 @@ namespace BaseBusiness.Model
     [Table("stock_in")]
     public class StockInModel
     {
-        [Key]
-        public long Id { get; set; }
-
         public long SupplierId { get; set; }
         [ForeignKey("SupplierId")]
         public SupplierModel Supplier { get; set; }

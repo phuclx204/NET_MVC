@@ -1,16 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("order_items")]
-    public class OrderItemModel
+    public class OrderItemModel : BaseModel
     {
-        [Key]
-        [Column("id")]
-        public long Id { get; set; }
-
         [Column("order_id")]
         public long? OrderId { get; set; }
 

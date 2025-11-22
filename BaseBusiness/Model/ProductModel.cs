@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("products")]
-    public class ProductModel
+    public class ProductModel : BaseModel
     {
-        [Key]
-        public long Id { get; set; }
-
         [Required, MaxLength(150)]
         public string Name { get; set; }
 
@@ -22,8 +20,6 @@ namespace BaseBusiness.Model
         public BrandModel Brand { get; set; }
 
         public string Description { get; set; }
-
-        public byte Status { get; set; } = 1;
 
         public ICollection<ProductDetailModel> ProductDetails { get; set; }
     }

@@ -33,7 +33,7 @@ namespace Modules.Catalog.Services
 
         public bool Create(ColorModel color)
         {
-            // Dùng @Name la sql parameter để tránh SQL Injection
+            // Dùng @Name(sql parameter) để tránh SQL Injection
             string sql = @"INSERT INTO colors (name, code, status, created_at) 
                            VALUES (@Name, @Code, 1, GETDATE())";
 

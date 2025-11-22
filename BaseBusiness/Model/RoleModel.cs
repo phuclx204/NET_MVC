@@ -1,15 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("roles")]
-    public class RoleModel
+    public class RoleModel : BaseModel
     {
-        [Key]
-        [Column("id")]
-        public long Id { get; set; }
-
         [Column("name")]
         [StringLength(50)]
         public string Name { get; set; }
