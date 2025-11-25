@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "tU+yngt0dPo=",
+  "dgSpecHash": "ywz6qMkhiSA=",
   "success": true,
   "projectFilePath": "D:\\NET_MVC\\WebApp\\WebApp\\WebApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
+    "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
+    "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.8\\microsoft.aspnetcore.authentication.jwtbearer.8.0.8.nupkg.sha512",
     "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\8.0.0\\microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
     "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\microsoft.bcl.cryptography\\8.0.0\\microsoft.bcl.cryptography.8.0.0.nupkg.sha512",
     "C:\\Users\\Trienkhai-PC\\.nuget\\packages\\microsoft.data.sqlclient\\6.1.3\\microsoft.data.sqlclient.6.1.3.nupkg.sha512",

@@ -6,33 +6,23 @@ using BaseBusiness.base_class;
 namespace BaseBusiness.Model
 {
     [Table("vouchers")]
-    public class VoucherModel : BaseModel
+    public class VoucherModel
     {
-        [Column("code")]
-        [StringLength(50)]
+        [Key]
+        public long Id { get; set; }
         public string Code { get; set; }
-
-        [Column("description")]
-        [StringLength(255)]
+        public long? UserId { get; set; }
+        public int UsageLimit { get; set; }
+        public int UsedCount { get; set; }
         public string Description { get; set; }
-
-        [Column("discount_type")]
-        [StringLength(10)]
         public string DiscountType { get; set; }
+        public decimal DiscountValue { get; set; }
+        public decimal MaxDiscount { get; set; }
+        public decimal MinOrder { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public byte Status { get; set; }
 
-        [Column("discount_value")]
-        public decimal? DiscountValue { get; set; }
-
-        [Column("min_order")]
-        public decimal? MinOrder { get; set; }
-
-        [Column("start_date")]
-        public DateTime? StartDate { get; set; }
-
-        [Column("end_date")]
-        public DateTime? EndDate { get; set; }
-
-        [Column("status")]
-        public byte? Status { get; set; }
+        public UserModel User { get; set; }
     }
 }

@@ -7,7 +7,8 @@ namespace BaseBusiness.Model
     [Table("brands")]
     public class BrandModel : BaseModel
     {
-        [Column("name")]
         public string Name { get; set; }
+        public string Country { get; set; }
+        public string Logo { get; set; }
     }
 }
