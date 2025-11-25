@@ -1,46 +1,28 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BaseBusiness.base_class;
 
 namespace BaseBusiness.Model
 {
     [Table("orders")]
-    public class OrderModel
+    public class OrderModel : FullAuditModel
     {
-        [Key]
-        [Column("id")]
-        public long Id { get; set; }
-
-        [Column("customer_id")]
-        public long? CustomerId { get; set; }
-
-        [Column("user_id")]
-        public long? UserId { get; set; } // Người tạo đơn (nhân viên)
-
-        [Column("voucher_id")]
+        public long CustomerId { get; set; }
+        public long UserId { get; set; }
         public long? VoucherId { get; set; }
+        public string Code { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal FinalAmount { get; set; }
+        public string PaymentStatus { get; set; }
+        public decimal ShippingFee { get; set; }
+        public string Status { get; set; }
+        public string Note { get; set; }
 
-        [Column("total_amount")]
-        public decimal? TotalAmount { get; set; }
-
-        [Column("discount_amount")]
-        public decimal? DiscountAmount { get; set; }
-
-        [Column("final_amount")]
-        public decimal? FinalAmount { get; set; }
-
-        [Column("status")]
-        [StringLength(30)]
-        public string Status { get; set; } // Pending, Completed, Cancelled...
-
-        [Column("created_at")]
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
-
-        // Foreign Keys
-        [ForeignKey("CustomerId")]
-        public virtual CustomerModel Customer { get; set; }
-
-        [ForeignKey("VoucherId")]
-        public virtual VoucherModel Voucher { get; set; }
+        public CustomerModel Customer { get; set; }
+        public UserModel User { get; set; }
+        public VoucherModel Voucher { get; set; }
+        public ICollection<OrderItemModel> OrderItems { get; set; }
     }
 }

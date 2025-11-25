@@ -5,17 +5,16 @@ using BaseBusiness.base_class;
 namespace BaseBusiness.Model
 {
     [Table("suppliers")]
-    public class SupplierModel : BaseModel
+    public class SupplierModel
     {
-        [Required, MaxLength(150)]
+        [Key]
+        public long Id { get; set; }
+        public string TaxCode { get; set; }
         public string Name { get; set; }
-
-        [MaxLength(15)]
+        public string ContacPerson { get; set; }
         public string Phone { get; set; }
-
-        [MaxLength(100)]
         public string Email { get; set; }
-
         public string Address { get; set; }
+        public string Note { get; set; }
     }
 }

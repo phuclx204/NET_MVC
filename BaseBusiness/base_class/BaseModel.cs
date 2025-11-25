@@ -1,23 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using BaseBusiness.Model;
 
 namespace BaseBusiness.base_class
 {
-    public class BaseModel
+    public interface IEntity
     {
-        [Key]
-        [Column("id")]
+        long Id { get; set; }
+    }
+
+    public abstract class BaseModel : IEntity
+    {
         public long Id { get; set; }
-
-        [Column("created_at")]
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
-
-        [Column("updated_at")]
+        public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-
-        [Column("status")]
         public byte Status { get; set; } = 1;
+    }
+    public abstract class FullAuditModel : BaseModel
+    {
+        public long? CreatedBy { get; set; }
+        public long? UpdatedBy { get; set; }
 
+        public UserModel CreatedByUser { get; set; }
+        public UserModel UpdatedByUser { get; set; }
     }
 }
-    

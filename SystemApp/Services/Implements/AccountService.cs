@@ -20,7 +20,8 @@ namespace Modules.SystemApp.Services
         }
         public string Login(LoginDto loginDto)
         {
-            string sql = "SELECT * FROM users WHERE email = @Email";
+            string sql = @"SELECT id, name, email, password, status 
+                           FROM users WHERE email = @Email";
 
             SqlParameter[] parameters = new SqlParameter[]
             {
@@ -35,7 +36,7 @@ namespace Modules.SystemApp.Services
             if (!isPasswordValid) return null;
 
             string sqlRole = @"SELECT r.name FROM roles r JOIN
-                               role_user ru ON r.id = ru.user_id
+                               role_user ru ON r.id = ru.role_id
                                WHERE ru.user_id = @UserId";
 
             SqlParameter[] roleParams = new SqlParameter[]

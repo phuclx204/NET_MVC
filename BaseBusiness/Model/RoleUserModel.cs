@@ -12,5 +12,7 @@ namespace BaseBusiness.Model
         [Column("role_id")]
         public long RoleId { get; set; }
 
+        public UserModel User { get; set; }
+        public RoleModel Role { get; set; }
     }
 }

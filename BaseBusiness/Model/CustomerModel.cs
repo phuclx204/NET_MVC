@@ -8,20 +8,13 @@ namespace BaseBusiness.Model
     [Table("customers")]
     public class CustomerModel : BaseModel
     {
-        [Column("name")]
-        [StringLength(100)]
         public string Name { get; set; }
-
-        [Column("phone")]
-        [StringLength(15)]
+        public byte? Gender { get; set; }
+        public DateTime? Dob { get; set; }
+        public string Tier { get; set; }
         public string Phone { get; set; }
-
-        [Column("email")]
-        [StringLength(100)]
         public string Email { get; set; }
-
-        [Column("address")]
-        [StringLength(255)]
         public string Address { get; set; }
+        public string Note { get; set; }
     }
 }
