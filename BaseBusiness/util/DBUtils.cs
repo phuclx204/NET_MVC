@@ -2,115 +2,273 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations.Schema; 
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 
 namespace BaseBusiness.util
 {
-    public class DBUtils
+    public class DBUtilsPro
     {
-        // Property để lấy chuỗi kết nối (Đọc 1 lần duy nhất khi ứng dụng chạy)
-        public static string ConnectionString { get; set; }
-      
-        /// <summary>
-        /// Hàm dùng để Lấy danh sách (SELECT) và map vào List Model
-        /// </summary>
-        public static List<T> GetList<T>(string sql, SqlParameter[] parameters = null) where T : new()
-        {
-            List<T> list = new List<T>();
+        private readonly string _connectionString;
 
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
+        // Transaction Context
+        private SqlConnection _txConnection;
+        private SqlTransaction _transaction;
+
+        public DBUtilsPro(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        // ======================================================================
+        //                           TRANSACTION SUPPORT
+        // ======================================================================
+
+        public async Task BeginTransactionAsync()
+        {
+            if (_txConnection != null)
+                throw new Exception("Transaction has already started.");
+
+            _txConnection = new SqlConnection(_connectionString);
+            await _txConnection.OpenAsync();
+
+            _transaction = _txConnection.BeginTransaction();
+        }
+
+        public void Commit()
+        {
+            if (_transaction == null)
+                throw new Exception("No active transaction.");
+
+            _transaction.Commit();
+            _txConnection.Close();
+
+            _transaction = null;
+            _txConnection = null;
+        }
+
+        public void Rollback()
+        {
+            if (_transaction == null)
+                throw new Exception("No active transaction.");
+
+            _transaction.Rollback();
+            _txConnection.Close();
+
+            _transaction = null;
+            _txConnection = null;
+        }
+
+        private SqlConnection GetConnection() =>
+            _txConnection ?? new SqlConnection(_connectionString);
+
+        private SqlTransaction GetTransaction() =>
+            _transaction; // may be null → normal mode
+
+        // ======================================================================
+        //                            PROPERTY MAP CACHE
+        // ======================================================================
+
+        private static readonly Dictionary<Type, List<PropertyMap>> _mapCache
+            = new Dictionary<Type, List<PropertyMap>>();
+
+        private static List<PropertyMap> GetPropertyMaps(Type type)
+        {
+            if (_mapCache.TryGetValue(type, out var cached))
+                return cached;
+
+            var list = new List<PropertyMap>();
+
+            foreach (var prop in type.GetProperties())
             {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                // 1. Ưu tiên ColumnAttribute
+                string dbColumn = prop.Name;
+
+                var colAttr = prop.GetCustomAttribute<ColumnAttribute>();
+                if (colAttr != null)
                 {
+                    dbColumn = colAttr.Name;
+                }
+                else
+                {
+                    // 2. Nếu không có ColumnAttribute → auto snake_case
+                    dbColumn = ToSnakeCase(prop.Name);
+                }
+
+                list.Add(new PropertyMap
+                {
+                    Property = prop,
+                    ColumnName = dbColumn,
+                    Type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType
+                });
+            }
+
+            _mapCache[type] = list;
+            return list;
+        }
+
+        private class PropertyMap
+        {
+            public PropertyInfo Property { get; set; }
+            public string ColumnName { get; set; }
+            public Type Type { get; set; }
+        }
+
+        // ======================================================================
+        //                   AUTO-CONVERT camelCase <-> snake_case
+        // ======================================================================
+
+        public static string ToSnakeCase(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input;
+
+            var result = "";
+            foreach (var c in input)
+            {
+                if (char.IsUpper(c))
+                {
+                    if (result.Length > 0) result += "_";
+                    result += char.ToLower(c);
+                }
+                else
+                {
+                    result += c;
+                }
+            }
+            return result;
+        }
+
+        // ======================================================================
+        //                          VALUE CONVERTER
+        // ======================================================================
+
+        private static object ConvertValue(object value, Type targetType)
+        {
+            if (value == null || value == DBNull.Value)
+                return null;
+
+            // Guid
+            if (targetType == typeof(Guid))
+                return Guid.Parse(value.ToString());
+
+            // Enum
+            if (targetType.IsEnum)
+                return Enum.Parse(targetType, value.ToString());
+
+            // byte[]
+            if (targetType == typeof(byte[]))
+                return (byte[])value;
+
+            return Convert.ChangeType(value, targetType);
+        }
+
+        // ======================================================================
+        //                        GET LIST (async + fast)
+        // ======================================================================
+
+        public async Task<List<T>> GetListAsync<T>(string sql, SqlParameter[] parameters = null) where T : new()
+        {
+            var result = new List<T>();
+            var maps = GetPropertyMaps(typeof(T));
+
+            using (var conn = GetConnection())
+            {
+                if (_txConnection == null)
+                    await conn.OpenAsync(); // auto open when not in transaction
+
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Transaction = GetTransaction();
                     if (parameters != null) cmd.Parameters.AddRange(parameters);
 
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        DataTable dt = new DataTable();
-                        adapter.Fill(dt);
-
-                        // Lấy thông tin Property một lần để tối ưu hiệu năng
-                        PropertyInfo[] properties = typeof(T).GetProperties();
-
-                        foreach (DataRow row in dt.Rows)
+                        while (await reader.ReadAsync())
                         {
-                            T item = new T();
-                            foreach (PropertyInfo prop in properties)
+                            var item = new T();
+
+                            foreach (var map in maps)
                             {
-                                // 1. Xác định tên cột trong DB dựa vào Attribute [Column("name")] hoặc tên Property
-                                string dbColumnName = prop.Name;
-                                var colAttr = prop.GetCustomAttribute<ColumnAttribute>();
-                                if (colAttr != null) dbColumnName = colAttr.Name;
+                                if (!reader.HasColumn(map.ColumnName)) continue;
 
-                                // 2. Map dữ liệu
-                                if (dt.Columns.Contains(dbColumnName) && row[dbColumnName] != DBNull.Value)
-                                {
-                                    try
-                                    {
-                                        object dbValue = row[dbColumnName];
+                                object dbValue = reader[map.ColumnName];
+                                if (dbValue == DBNull.Value) continue;
 
-                                        Type t = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-
-                                        object safeValue = Convert.ChangeType(dbValue, t);
-                                        prop.SetValue(item, safeValue);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"Lỗi map cột {dbColumnName}: {ex.Message}");
-                                    }
-                                }
+                                var safeValue = ConvertValue(dbValue, map.Type);
+                                map.Property.SetValue(item, safeValue);
                             }
-                            list.Add(item);
+
+                            result.Add(item);
                         }
                     }
                 }
             }
-            return list;
+
+            return result;
         }
 
-        /// <summary>
-        /// Hàm lấy 1 đối tượng duy nhất (SELECT Single)
-        /// </summary>
-        public static T GetItem<T>(string sql, SqlParameter[] parameters = null) where T : new()
+        // ======================================================================
+        //                        GET SINGLE ITEM
+        // ======================================================================
+
+        public async Task<T> GetItemAsync<T>(string sql, SqlParameter[] parameters = null) where T : new()
         {
-            var list = GetList<T>(sql, parameters);
-            return list.Count > 0 ? list[0] : default(T);
+            var list = await GetListAsync<T>(sql, parameters);
+            return list.Count > 0 ? list[0] : default;
         }
 
-        /// <summary>
-        /// Hàm thực thi Insert, Update, Delete
-        /// Trả về số dòng bị ảnh hưởng
-        /// </summary>
-        public static int ExecuteNonQuery(string sql, SqlParameter[] parameters)
+        // ======================================================================
+        //                       ExecuteNonQuery
+        // ======================================================================
+
+        public async Task<int> ExecuteNonQueryAsync(string sql, SqlParameter[] parameters = null)
         {
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            using (var conn = GetConnection())
             {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                if (_txConnection == null)
+                    await conn.OpenAsync();
+
+                using (var cmd = new SqlCommand(sql, conn))
                 {
+                    cmd.Transaction = GetTransaction();
                     if (parameters != null) cmd.Parameters.AddRange(parameters);
-                    return cmd.ExecuteNonQuery();
+
+                    return await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
 
-        /// <summary>
-        /// Hàm thực thi lấy về 1 giá trị đơn (ví dụ: SELECT COUNT(*), hoặc SELECT SCOPE_IDENTITY())
-        /// </summary>
-        public static object ExecuteScalar(string sql, SqlParameter[] parameters = null)
+        //                       ExecuteScalar
+
+        public async Task<object> ExecuteScalarAsync(string sql, SqlParameter[] parameters = null)
         {
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            using (var conn = GetConnection())
             {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                if (_txConnection == null)
+                    await conn.OpenAsync();
+
+                using (var cmd = new SqlCommand(sql, conn))
                 {
+                    cmd.Transaction = GetTransaction();
                     if (parameters != null) cmd.Parameters.AddRange(parameters);
-                    return cmd.ExecuteScalar();
+
+                    return await cmd.ExecuteScalarAsync();
                 }
             }
+        }
+    }
+
+    // Extension hỗ trợ kiểm tra xem DataReader có cột hay không
+    public static class DataReaderExtensions
+    {
+        public static bool HasColumn(this IDataRecord reader, string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+                if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+            return false;
         }
     }
 }
