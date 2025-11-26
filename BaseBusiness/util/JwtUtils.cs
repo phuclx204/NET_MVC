@@ -13,6 +13,7 @@ namespace BaseBusiness.util
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
             var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
+            var expiryMinutes = configuration.GetValue<int>("JwtSettings:ExpiresMinutes", 60);
 
             // 1. Tạo danh sách các thông tin (Claims) chứa trong Token
             var claims = new List<Claim>
@@ -32,7 +33,7 @@ namespace BaseBusiness.util
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(60),
+                Expires = DateTime.UtcNow.AddMinutes(expiryMinutes),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = jwtSettings["Issuer"],
                 Audience = jwtSettings["Audience"]

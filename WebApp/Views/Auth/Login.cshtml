@@ -1,0 +1,119 @@
+﻿@{
+    ViewData["Title"] = PageTitles.Auth;
+}
+
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin-top: 100px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background-color: white;
+        }
+    </style>
+
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="login-container">
+                    <h2 class="text-center mb-4">Đăng Nhập Hệ Thống</h2>
+
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn">
+                            <div class="invalid-feedback">Vui lòng nhập email hợp lệ.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Mật khẩu:</label>
+                            <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+                            <div class="invalid-feedback">Vui lòng nhập mật khẩu.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2">Đăng Nhập</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts{
+    <script>
+        // const token = localStorage.getItem('jwtToken');
+        $(document).ready(function() {
+            $("#loginForm").on("submit", function(event) {
+                event.preventDefault(); 
+
+                const email = $("#email").val().trim();
+                const password = $("#password").val().trim();
+
+                if (!email || !password) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Thiếu thông tin!',
+                        text: 'Vui lòng nhập đầy đủ Email và Mật khẩu.',
+                        confirmButtonText: 'Đóng'
+                    });
+                    return;
+                }
+
+                const loginData = {
+                    email: email,
+                    password: password
+                };
+                $.ajax({
+                    url: '/auth/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(loginData),
+
+                    success: function(response) {
+                        console.log("Email+pass : "+email + " + "+ password + " "+response.token);
+
+                        if (response && response.token) {
+
+                            localStorage.setItem('jwtToken', response.token);
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đăng nhập thành công!',
+                                text: 'Bạn sẽ được chuyển hướng đến trang quản trị.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = '/home';
+                            });
+
+                        } else {
+                             handleLoginError('Lỗi không xác định từ máy chủ.');
+                        }
+                    },
+
+                    error: function(xhr, status, error) {
+                        let errorMessage = 'Đã xảy ra lỗi kết nối mạng.';
+
+                        if (xhr.status === 401) {
+                            errorMessage = 'Sai địa chỉ Email hoặc Mật khẩu.';
+                        } else if (xhr.status === 400) {
+                            errorMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.';
+                        }
+                        handleLoginError(errorMessage);
+                    }
+                });
+            });
+
+            function handleLoginError(message) {
+                 Swal.fire({
+                    icon: 'error',
+                    title: 'Đăng nhập thất bại',
+                    text: message,
+                    confirmButtonText: 'Thử lại'
+                });
+            }
+
+        });
+    </script>
+}   

@@ -9,10 +9,10 @@ namespace Catalog.Services.Interfaces
 {
     public interface IColorService
     {
-        List<ColorModel> GetAll();
-        ColorModel GetById(long id);
-        bool Create(ColorModel model);
-        bool Update(ColorModel model);
-        bool Delete(long id);
+        Task<List<ColorModel>> GetAll();
+        Task<ColorModel> GetById(long id);
+        Task<bool> Create(ColorModel model);
+        Task<bool> Update(ColorModel model);
+        Task<bool> Delete(long id);
     }
 }

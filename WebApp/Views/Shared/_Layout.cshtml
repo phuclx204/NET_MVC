@@ -35,7 +35,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#"><span><i class="fa-solid fa-wrench me-2"></i> Cài đặt</span></a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><span><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng xuất</span></a></li>
+                            <li><a class="dropdown-item" href="#" onclick="handleLogout();return false;"><span><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng xuất</span></a></li>
                         </ul>
                     </li>
                 </ul>
@@ -169,6 +169,29 @@
         }
     }
     <script>
+    function handleLogout() {
+        $.ajax({
+            url: '/auth/logout',
+            type: 'POST',
+            success: function() {
+                localStorage.removeItem('jwtToken');
+            
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã đăng xuất!',
+                    text: 'Hẹn gặp lại.',
+                    showConfirmButton: false,
+                    timer: 1000
+                }).then(() => {
+                    window.location.href = '/auth/login'; 
+                });
+            },
+            error: function(xhr, status, error) {
+                localStorage.removeItem('jwtToken');
+                window.location.href = '/auth/login';
+            }
+        });
+    }
         document.addEventListener("DOMContentLoaded", function() {
             // Lấy tất cả link toggle collapse
             const collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');

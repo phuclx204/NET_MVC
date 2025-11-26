@@ -9,17 +9,23 @@ namespace Modules.Catalog.Services
 {
     public class SizeService : ISizeService
     {
-        public List<SizeModel> GetAll()
+        private readonly DBUtils DBUtils;
+
+        public SizeService(DBUtils dBUtils)
+        {
+            DBUtils = dBUtils;
+        }
+        public async Task<List<SizeModel>> GetAll()
         {
             // Dùng @ trước chuỗi để viết xuống dòng
             string sql = @"SELECT * FROM sizes 
                            WHERE status = 1 
                            ORDER BY created_at DESC";
 
-            return DBUtils.GetList<SizeModel>(sql);
+            return await DBUtils.GetListAsync<SizeModel>(sql);
         }
 
-        public SizeModel GetById(long id)
+        public async Task<SizeModel> GetById(long id)
         {
             string sql = "SELECT * FROM sizes WHERE id = @Id";
 
@@ -28,10 +34,10 @@ namespace Modules.Catalog.Services
                 new SqlParameter("@Id", id)
             };
 
-            return DBUtils.GetItem<SizeModel>(sql, parameters);
+            return await DBUtils.GetItemAsync<SizeModel>(sql, parameters);
         }
 
-        public bool Create(SizeModel size)
+        public async Task<bool> Create(SizeModel size)
         {
             // Dùng @Name la sql parameter để tránh SQL Injection
             string sql = @"INSERT INTO sizes (name, status, created_at) 
@@ -42,11 +48,11 @@ namespace Modules.Catalog.Services
                 new SqlParameter("@Name", size.Name)
             };
 
-            return DBUtils.ExecuteNonQuery(sql, parameters) > 0;
+            return await DBUtils.ExecuteNonQueryAsync(sql, parameters) > 0;
         }
 
         // 3. Cập nhật kích thước
-        public bool Update(SizeModel size)
+        public async Task<bool> Update(SizeModel size)
         {
             string sql = @"UPDATE sizes 
                            SET name = @Name, 
@@ -59,11 +65,11 @@ namespace Modules.Catalog.Services
                 new SqlParameter("@Name", size.Name)
             };
 
-            return DBUtils.ExecuteNonQuery(sql, parameters) > 0;
+            return await DBUtils.ExecuteNonQueryAsync(sql, parameters) > 0;
         }
 
         // 4. Xóa màu (Xóa mềm - chỉ đổi status)
-        public bool Delete(long id)
+        public async Task<bool> Delete(long id)
         {
             string sql = @"UPDATE sizes SET status = 0 WHERE id = @Id";
 
@@ -72,7 +78,7 @@ namespace Modules.Catalog.Services
                 new SqlParameter("@Id", id)
             };
 
-            return DBUtils.ExecuteNonQuery(sql, parameters) > 0;
+            return await DBUtils.ExecuteNonQueryAsync(sql, parameters) > 0;
         }
     }
 }

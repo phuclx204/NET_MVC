@@ -6,16 +6,64 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SystemApp.DTOs;
 
 namespace SystemApp.Controllers
 {
     [Route("auth")]
     public class AuthController : Controller
     {
-        public IActionResult Index()
+        private readonly IAccountService _accountService;
+
+        public AuthController(IAccountService accountService)
         {
-            return View();
+            _accountService = accountService;
+        }
+        [HttpGet("login")]
+        public IActionResult LoginForm()
+        {
+            return View("Login");
         }
 
+        [HttpGet("register")]
+        public IActionResult RegisterForm()
+        {
+            return View("Register");
+        }
+
+
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+
+            var token = await _accountService.Login(loginDto);
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized(new { message = "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu." });
+            }
+            return Ok(new { token });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid input");
+
+            bool success = await _accountService.Register(dto);
+
+            if (!success)
+                return BadRequest("Username already exists");
+
+            return Ok("Register successful");
+        }
+
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            return Ok(new { message = "Đăng xuất thành công." });
+        }
     }
 }

@@ -15,5 +15,6 @@
         public const string Voucher = "/voucher";
         public const string Employee = "/employee";
         public const string Pos = "/pos";
+        public const string Auth = "/auth/login";
     }
 }

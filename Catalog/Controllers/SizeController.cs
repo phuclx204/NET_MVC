@@ -24,15 +24,23 @@ namespace Catalog.Controllers
             return View();
         }
 
-        [HttpGet("get-all")]
-        public IActionResult GetList()
+        [HttpGet("form")]
+        public IActionResult Form(long id = 0)
         {
-            var sizes = _sizeService.GetAll();
+            ViewBag.Id = id;
+            return View("Save");
+        }
+
+
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetList()
+        {
+            var sizes = await _sizeService.GetAll();
             return Json(new { success = true, data = sizes });
         }
 
         [HttpPost("save")]
-        public IActionResult Save([FromBody] SizeModel size)
+        public async Task<IActionResult> Save([FromBody] SizeModel size)
         {
             bool result = false;
             string message = "";
@@ -40,12 +48,12 @@ namespace Catalog.Controllers
             {
                 if (size.Id == 0)
                 {
-                    result = _sizeService.Create(size);
+                    result = await _sizeService.Create(size);
                     message = result ? "Tạo kích thước thành công." : "Tạo kích thước thất bại.";
                 }
                 else
                 {
-                    result = _sizeService.Update(size);
+                    result = await _sizeService.Update(size);
                     message = result ? "Cập nhật kích thước thành công." : "Cập nhật kích thước thất bại.";
                 }
 
@@ -58,9 +66,9 @@ namespace Catalog.Controllers
         }
 
         [HttpPost("delete/{id:long}")]
-        public IActionResult Delete(long id)
+        public async Task<IActionResult> Delete(long id)
         {
-            var result = _sizeService.Delete(id);
+            var result = await _sizeService.Delete(id);
             return Json(new
             {
                 success = result,
@@ -68,18 +76,11 @@ namespace Catalog.Controllers
             });
         }
 
-        // 1. Action trả về View màn hình Save (Dùng cho cả Thêm mới và Sửa)
-        [HttpGet("form")]
-        public IActionResult Form(long id = 0)
-        {
-            ViewBag.Id = id;
-            return View("Save");
-        }
 
         [HttpGet("detail/{id}")]
-        public IActionResult GetDetail(long id)
+        public async Task<IActionResult> GetDetail(long id)
         {
-            var item = _sizeService.GetById(id);
+            var item = await _sizeService.GetById(id);
             if (item == null) return NotFound(new { success = false, message = "Không tìm thấy dữ liệu" });
 
             return Json(new { success = true, data = item });

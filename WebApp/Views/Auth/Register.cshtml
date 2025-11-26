@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = PageTitles.Auth;
+}
+<div class="container">
+<form id="registerForm">
+
+    <div class="mb-3">
+        <label class="form-label">Name:</label>
+        <input type="text" class="form-control" id="name" placeholder="Nhập tên">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email:</label>
+        <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn">
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label">Mật khẩu:</label>
+        <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 py-2">Đăng ký</button>
+</form>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+
+            $("#registerForm").on("submit", function (event) {
+                event.preventDefault();
+
+                const name = $("#name").val().trim();
+                const email = $("#email").val().trim();
+                const password = $("#password").val().trim();
+
+                if (!name || !email || !password) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Thiếu thông tin',
+                        text: 'Vui lòng nhập đầy đủ các trường'
+                    });
+                    return;
+                }
+
+                const registerData = {
+                    name: name,
+                    email: email,
+                    password: password
+                };
+
+                $.ajax({
+                    url: '/auth/register',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(registerData),
+
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Đăng ký thành công!',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '/auth/login';
+                        });
+                    },
+
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi đăng ký',
+                            text: xhr.responseText || "Đã xảy ra lỗi"
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>
+}

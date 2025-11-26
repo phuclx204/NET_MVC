@@ -15,5 +15,6 @@
         public const string Voucher = "Khuyến mãi";
         public const string Employee = "Nhân viên";
         public const string Pos = "Bán hàng";
+        public const string Auth = "Xác thực";
     }
 }
