@@ -24,15 +24,23 @@ namespace Catalog.Controllers
             return View();
         }
 
-        [HttpGet("get-all")]
-        public IActionResult GetList()
+        [HttpGet("form")]
+        public IActionResult Form(long id = 0)
         {
-            var colors = _colorService.GetAll();
+            ViewBag.Id = id;
+            return View("Save");
+        }
+
+
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetList()
+        {
+            var colors = await _colorService.GetAll();
             return Json(new { success = true, data = colors });
         }
 
         [HttpPost("save")]
-        public IActionResult Save([FromBody] ColorModel color)
+        public async Task<IActionResult> Save([FromBody] ColorModel color)
         {
             bool result = false;
             string message = "";
@@ -40,12 +48,12 @@ namespace Catalog.Controllers
             {
                 if (color.Id == 0)
                 {
-                    result = _colorService.Create(color);
+                    result = await _colorService.Create(color);
                     message = result ? "Tạo màu sắc thành công." : "Tạo màu sắc thất bại.";
                 }
                 else
                 {
-                    result = _colorService.Update(color);
+                    result = await _colorService.Update(color);
                     message = result ? "Cập nhật màu sắc thành công." : "Cập nhật màu sắc thất bại.";
                 }
 
@@ -58,27 +66,22 @@ namespace Catalog.Controllers
         }
 
         [HttpPost("delete/{id:long}")]
-        public IActionResult Delete( long id)
+        public async Task<IActionResult> Delete(long id)
         {
-            var result = _colorService.Delete(id);
-            return Json(new {
-                success = result, 
-                message = result ? "Xóa màu sắc thành công." : "Xóa thất bại" 
+            var result = await _colorService.Delete(id);
+            return Json(new
+            {
+                success = result,
+                message = result ? "Xóa màu sắc thành công." : "Xóa thất bại"
             });
         }
 
-        // 1. Action trả về View màn hình Save (Dùng cho cả Thêm mới và Sửa)
-        [HttpGet("form")]
-        public IActionResult Form(long id = 0)
-        {
-            ViewBag.Id = id;
-            return View("Save");
-        }
+
 
         [HttpGet("detail/{id}")]
-        public IActionResult GetDetail(long id)
+        public async Task<IActionResult> GetDetail(long id)
         {
-            var item = _colorService.GetById(id);
+            var item = await _colorService.GetById(id);
             if (item == null) return NotFound(new { success = false, message = "Không tìm thấy dữ liệu" });
 
             return Json(new { success = true, data = item });

@@ -23,16 +23,23 @@ namespace Catalog.Controllers
         {
             return View();
         }
+        [HttpGet("form")]
+        public IActionResult Form(long id = 0)
+        {
+            ViewBag.Id = id;
+            return View("Save");
+        }
+
 
         [HttpGet("get-all")]
-        public IActionResult GetList()
+        public async Task<IActionResult> GetList()
         {
-            var brands = _brandService.GetAll();
+            var brands = await _brandService.GetAll();
             return Json(new { success = true, data = brands });
         }
 
         [HttpPost("save")]
-        public IActionResult Save([FromBody] BrandModel brand)
+        public async Task<IActionResult> Save([FromBody] BrandModel brand)
         {
             bool result = false;
             string message = "";
@@ -40,12 +47,12 @@ namespace Catalog.Controllers
             {
                 if (brand.Id == 0)
                 {
-                    result = _brandService.Create(brand);
+                    result = await _brandService.Create(brand);
                     message = result ? "Tạo thương hiệu thành công." : "Tạo thương hiệu thất bại.";
                 }
                 else
                 {
-                    result = _brandService.Update(brand);
+                    result = await _brandService.Update(brand);
                     message = result ? "Cập nhật thương hiệu thành công." : "Cập nhật thương hiệu thất bại.";
                 }
             }
@@ -57,13 +64,13 @@ namespace Catalog.Controllers
         }
 
         [HttpPost("delete/{id:long}")]
-        public IActionResult Delete(long id)
+        public async Task<IActionResult> Delete(long id)
         {
             bool result = false;
             string message = "";
             try
             {
-                result = _brandService.Delete(id);
+                result = await _brandService.Delete(id);
                 message = result ? "Xóa thương hiệu thành công." : "Xóa thương hiệu thất bại.";
             }
             catch (Exception ex)
@@ -73,17 +80,12 @@ namespace Catalog.Controllers
             return Json(new { success = result, message = message });
         }
 
-        [HttpGet("form")]
-        public IActionResult Form(long id = 0)
-        {
-            ViewBag.Id = id;
-            return View("Save");
-        }
+
 
         [HttpGet("detail/{id:long}")]
-        public IActionResult Detail(long id)
+        public async Task<IActionResult> Detail(long id)
         {
-            var item = _brandService.GetById(id);
+            var item = await _brandService.GetById(id);
             if (item == null)
             {
                 return NotFound(new { success = false, message = "Không tìm thấy thương hiệu." });

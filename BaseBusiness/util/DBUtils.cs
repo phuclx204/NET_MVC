@@ -8,7 +8,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BaseBusiness.util
 {
-    public class DBUtilsPro
+    public class DBUtils
     {
         private readonly string _connectionString;
 
@@ -16,15 +16,12 @@ namespace BaseBusiness.util
         private SqlConnection _txConnection;
         private SqlTransaction _transaction;
 
-        public DBUtilsPro(string connectionString)
+        public DBUtils(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        // ======================================================================
         //                           TRANSACTION SUPPORT
-        // ======================================================================
-
         public async Task BeginTransactionAsync()
         {
             if (_txConnection != null)
@@ -64,12 +61,9 @@ namespace BaseBusiness.util
             _txConnection ?? new SqlConnection(_connectionString);
 
         private SqlTransaction GetTransaction() =>
-            _transaction; // may be null → normal mode
+            _transaction;
 
-        // ======================================================================
         //                            PROPERTY MAP CACHE
-        // ======================================================================
-
         private static readonly Dictionary<Type, List<PropertyMap>> _mapCache
             = new Dictionary<Type, List<PropertyMap>>();
 
@@ -92,7 +86,6 @@ namespace BaseBusiness.util
                 }
                 else
                 {
-                    // 2. Nếu không có ColumnAttribute → auto snake_case
                     dbColumn = ToSnakeCase(prop.Name);
                 }
 
@@ -115,10 +108,7 @@ namespace BaseBusiness.util
             public Type Type { get; set; }
         }
 
-        // ======================================================================
         //                   AUTO-CONVERT camelCase <-> snake_case
-        // ======================================================================
-
         public static string ToSnakeCase(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return input;
@@ -139,17 +129,22 @@ namespace BaseBusiness.util
             return result;
         }
 
-        // ======================================================================
         //                          VALUE CONVERTER
-        // ======================================================================
-
         private static object ConvertValue(object value, Type targetType)
         {
+            // Case: NULL from DB
             if (value == null || value == DBNull.Value)
-                return null;
+            {
+                // Nullable<T> → return null
+                if (Nullable.GetUnderlyingType(targetType) != null)
+                    return null;
+
+                // Value type (int, long, DateTime, byte, bool, etc.)
+                return Activator.CreateInstance(targetType);
+            }
 
             // Guid
-            if (targetType == typeof(Guid))
+            if (targetType == typeof(Guid) || targetType == typeof(Guid?))
                 return Guid.Parse(value.ToString());
 
             // Enum
@@ -160,22 +155,49 @@ namespace BaseBusiness.util
             if (targetType == typeof(byte[]))
                 return (byte[])value;
 
+            // Nullable<T> → unwrap to underlying type
+            var underlying = Nullable.GetUnderlyingType(targetType);
+            if (underlying != null)
+                return Convert.ChangeType(value, underlying);
+
             return Convert.ChangeType(value, targetType);
         }
 
-        // ======================================================================
-        //                        GET LIST (async + fast)
-        // ======================================================================
 
-        public async Task<List<T>> GetListAsync<T>(string sql, SqlParameter[] parameters = null) where T : new()
+        //               GET LIST (async)
+        public async Task<List<T>> GetListAsync<T>(string sql, SqlParameter[] parameters = null)
         {
+            var targetType = typeof(T);
+
+            if (targetType.IsPrimitive || targetType == typeof(string) || targetType == typeof(decimal))
+            {
+                var primitiveList = new List<T>();
+                using (var conn = GetConnection())
+                {
+                    if (_txConnection == null) await conn.OpenAsync();
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Transaction = GetTransaction();
+                        if (parameters != null) cmd.Parameters.AddRange(parameters);
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                primitiveList.Add((T)ConvertValue(reader.GetValue(0), targetType));
+                            }
+                        }
+                    }
+                }
+                return primitiveList;
+            }
+
+            // Xử lý trường hợp Class Model (Sử dụng Reflection Mapping)
             var result = new List<T>();
-            var maps = GetPropertyMaps(typeof(T));
+            var maps = GetPropertyMaps(targetType);
 
             using (var conn = GetConnection())
             {
-                if (_txConnection == null)
-                    await conn.OpenAsync(); // auto open when not in transaction
+                if (_txConnection == null) await conn.OpenAsync();
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
@@ -186,7 +208,8 @@ namespace BaseBusiness.util
                     {
                         while (await reader.ReadAsync())
                         {
-                            var item = new T();
+                            // Yêu cầu T phải có Constructor mặc định
+                            var item = Activator.CreateInstance<T>();
 
                             foreach (var map in maps)
                             {
@@ -204,24 +227,18 @@ namespace BaseBusiness.util
                     }
                 }
             }
-
             return result;
         }
 
-        // ======================================================================
-        //                        GET SINGLE ITEM
-        // ======================================================================
-
-        public async Task<T> GetItemAsync<T>(string sql, SqlParameter[] parameters = null) where T : new()
+        //               GET SINGLE ITEM (async)
+        public async Task<T> GetItemAsync<T>(string sql, SqlParameter[] parameters = null)
         {
+            // Tận dụng GetListAsync
             var list = await GetListAsync<T>(sql, parameters);
             return list.Count > 0 ? list[0] : default;
         }
 
-        // ======================================================================
-        //                       ExecuteNonQuery
-        // ======================================================================
-
+        //               ExecuteNonQuery (async)
         public async Task<int> ExecuteNonQueryAsync(string sql, SqlParameter[] parameters = null)
         {
             using (var conn = GetConnection())
@@ -235,25 +252,6 @@ namespace BaseBusiness.util
                     if (parameters != null) cmd.Parameters.AddRange(parameters);
 
                     return await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        //                       ExecuteScalar
-
-        public async Task<object> ExecuteScalarAsync(string sql, SqlParameter[] parameters = null)
-        {
-            using (var conn = GetConnection())
-            {
-                if (_txConnection == null)
-                    await conn.OpenAsync();
-
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Transaction = GetTransaction();
-                    if (parameters != null) cmd.Parameters.AddRange(parameters);
-
-                    return await cmd.ExecuteScalarAsync();
                 }
             }
         }

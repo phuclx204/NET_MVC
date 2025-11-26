@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace SystemApp.DTOs
 {
-    public class LoginDto
+    public class RegisterDto
     {
-        [Required(ErrorMessage = "Email không được để trống")]
+        public string Name { get; set; }
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu không được để trống")]
         public string Password { get; set; }
     }
 }

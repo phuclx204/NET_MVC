@@ -17,9 +17,9 @@ using SystemApp.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Đọc chuỗi kết nối từ appsettings.json của WebApp
 string connString = builder.Configuration.GetConnectionString("DefaultConnection");
-DBUtils.ConnectionString = connString;
+
+builder.Services.AddScoped<DBUtils>(sp => new DBUtils(connString));
 
 
 // Add services to the container.
@@ -33,6 +33,7 @@ builder.Services.AddControllersWithViews()
     .AddApplicationPart(typeof(CustomerController).Assembly)
     .AddApplicationPart(typeof(VoucherController).Assembly)
     .AddApplicationPart(typeof(EmployeeController).Assembly)
+    .AddApplicationPart(typeof(AuthController).Assembly)
     ;
 
 builder.Services.AddScoped<IColorService, ColorService>();
@@ -43,6 +44,7 @@ builder.Services.AddScoped<IStockInService, StockInService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 
 // --- Cấu hình JWT ---
@@ -72,6 +74,10 @@ var app = builder.Build();
 
 app.MapGet("/", () => Results.Redirect("/home"));
 app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
@@ -82,8 +88,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.Run();

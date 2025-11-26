@@ -9,10 +9,10 @@ namespace Catalog.Services.Interfaces
 {
     public interface ISizeService
     {
-        List<SizeModel> GetAll();
-        SizeModel GetById(long id);
-        bool Create(SizeModel model);
-        bool Update(SizeModel model);
-        bool Delete(long id);
+        Task<List<SizeModel>> GetAll();
+        Task<SizeModel> GetById(long id);
+        Task<bool> Create(SizeModel model);
+        Task<bool> Update(SizeModel model);
+        Task<bool> Delete(long id);
     }
 }

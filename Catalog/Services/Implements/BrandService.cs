@@ -9,7 +9,12 @@ namespace Modules.Catalog.Services
 {
     public class BrandService : IBrandService
     {
-        public bool Create(BrandModel model)
+        private readonly DBUtils DBUtils;
+        public BrandService(DBUtils dBUtils)
+        {
+            DBUtils = dBUtils;
+        }
+        public async Task<bool> Create(BrandModel model)
         {
             string sql = @"INSERT INTO brands (name, status)
                        VALUES (@Name, 1)";
@@ -17,35 +22,35 @@ namespace Modules.Catalog.Services
                 new SqlParameter("@Name",model.Name)
             };
 
-            return DBUtils.ExecuteNonQuery(sql, parameters) > 0;
+            return await DBUtils.ExecuteNonQueryAsync(sql, parameters) > 0;
         }
 
-        public bool Delete(long id)
+        public async Task<bool> Delete(long id)
         {
             string sql = @"UPDATE brands SET status = 0
                            WHERE id = @Id";
             SqlParameter[] pa = new SqlParameter[] {
                 new SqlParameter("@Id",id)
             };
-            return DBUtils.ExecuteNonQuery(sql, pa) > 0;
+            return await DBUtils.ExecuteNonQueryAsync(sql, pa) > 0;
         }
 
-        public List<BrandModel> GetAll()
+        public async Task<List<BrandModel>> GetAll()
         {
             string sql = @"SELECT * FROM brands WHERE status = 1";
-            return DBUtils.GetList<BrandModel>(sql);
+            return await DBUtils.GetListAsync<BrandModel>(sql);
         }
 
-        public BrandModel GetById(long id)
+        public async Task<BrandModel> GetById(long id)
         {
             string sql = "SELECT * FROM brands WHERE id = @Id";
             SqlParameter[] pa = new SqlParameter[] {
                 new SqlParameter("@Id",id)
             };
-            return DBUtils.GetItem<BrandModel>(sql, pa);
+            return await DBUtils.GetItemAsync<BrandModel>(sql, pa);
         }
 
-        public bool Update(BrandModel model)
+        public async Task<bool> Update(BrandModel model)
         {
             string sql = "UPDATE brands SET name = @Name WHERE id = @Id";
 
@@ -53,7 +58,7 @@ namespace Modules.Catalog.Services
                 new SqlParameter("@Name",model.Name),
                 new SqlParameter("@Id",model.Id)
             };
-            return DBUtils.ExecuteNonQuery(sql, pa) > 0;
+            return await DBUtils.ExecuteNonQueryAsync(sql, pa) > 0;
         }
     }
 }

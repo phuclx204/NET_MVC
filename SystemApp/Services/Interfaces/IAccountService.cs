@@ -10,7 +10,7 @@ namespace SystemApp.Services.Interfaces
 {
     public interface IAccountService
     {
-        string Login(LoginDto loginDto);
-
+        Task<string> Login(LoginDto loginDto);
+        Task<bool> Register(RegisterDto dto);
     }
 }
