@@ -1,5 +1,5 @@
 ﻿using BaseBusiness.Model;
-using SystemApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SystemApp.DTOs;
+using SystemApp.Services.Interfaces;
 
 namespace SystemApp.Controllers
 {
+    [AllowAnonymous]
     [Route("auth")]
     public class AuthController : Controller
     {

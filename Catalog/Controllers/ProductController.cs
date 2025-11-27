@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BaseBusiness.Model;
 using BaseBusiness.util;
-using BaseBusiness.Model;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Collections.Generic;
 
 namespace Catalog.Controllers
 {
+    [Authorize]
+
     [Route("product")]
     public class ProductController : Controller
     {

@@ -1,4 +1,5 @@
 ﻿using BaseBusiness.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Controllers
 {
+    [Authorize]
     [Route("stock-in")]
     public class StockInController : Controller
     {

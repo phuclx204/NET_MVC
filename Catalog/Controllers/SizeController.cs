@@ -1,15 +1,18 @@
-﻿using System;
+﻿using BaseBusiness.Model;
+using Catalog.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Modules.Catalog.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BaseBusiness.Model;
-using Catalog.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Modules.Catalog.Services;
 
 namespace Catalog.Controllers
 {
+    [Authorize]
+
     [Route("size")]
     public class SizeController : Controller
     {

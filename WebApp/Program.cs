@@ -68,6 +68,15 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.Redirect("/auth/login");
+            return Task.CompletedTask;
+        }
+    };
 });
 
 var app = builder.Build();
