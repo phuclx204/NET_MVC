@@ -38,9 +38,13 @@
         });
 
         function loadData() {
+            // const token = localStorage.getItem('jwtToken');
             $.ajax({
                 url: '/size/get-all',
                 type: 'GET',
+                // headers: {
+                //     "Authorization": "Bearer " + token
+                // },
                 success: function (res) {
                     if (res.success) {
                         var html = '';

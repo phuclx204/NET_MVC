@@ -1,6 +1,7 @@
 ﻿using BaseBusiness.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,13 @@ namespace SystemApp.Controllers
             {
                 return Unauthorized(new { message = "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu." });
             }
+            Response.Cookies.Append("jwtToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(10)
+            });
             return Ok(new { token });
         }
 
@@ -65,7 +73,16 @@ namespace SystemApp.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
+            Response.Cookies.Append("jwtToken", "", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(-1),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+
             return Ok(new { message = "Đăng xuất thành công." });
         }
+
     }
 }

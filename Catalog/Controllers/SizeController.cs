@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 namespace Catalog.Controllers
 {
     [Authorize]
-
     [Route("size")]
     public class SizeController : Controller
     {
@@ -33,7 +32,6 @@ namespace Catalog.Controllers
             ViewBag.Id = id;
             return View("Save");
         }
-
 
         [HttpGet("get-all")]
         public async Task<IActionResult> GetList()
@@ -78,7 +76,6 @@ namespace Catalog.Controllers
                 message = result ? "Xóa thành công." : "Xóa thất bại"
             });
         }
-
 
         [HttpGet("detail/{id}")]
         public async Task<IActionResult> GetDetail(long id)
