@@ -26,19 +26,12 @@ namespace Catalog.Controllers
         {
             return View();
         }
-        [HttpGet("form")]
-        public IActionResult Form(long id = 0)
-        {
-            ViewBag.Id = id;
-            return View("Save");
-        }
-
 
         [HttpGet("get-all")]
         public async Task<IActionResult> GetList()
         {
             var brands = await _brandService.GetAll();
-            return Json(new { success = true, data = brands });
+            return Json(brands);
         }
 
         [HttpPost("save")]
@@ -63,37 +56,14 @@ namespace Catalog.Controllers
             {
                 message = ex.Message;
             }
-            return Json(new { success = result, message = message });
+            return Json(new { success = result, message, data = brand });
         }
 
         [HttpPost("delete/{id:long}")]
         public async Task<IActionResult> Delete(long id)
         {
-            bool result = false;
-            string message = "";
-            try
-            {
-                result = await _brandService.Delete(id);
-                message = result ? "Xóa thương hiệu thành công." : "Xóa thương hiệu thất bại.";
-            }
-            catch (Exception ex)
-            {
-                message = ex.Message;
-            }
-            return Json(new { success = result, message = message });
-        }
-
-
-
-        [HttpGet("detail/{id:long}")]
-        public async Task<IActionResult> Detail(long id)
-        {
-            var item = await _brandService.GetById(id);
-            if (item == null)
-            {
-                return NotFound(new { success = false, message = "Không tìm thấy thương hiệu." });
-            }
-            return Json(new { success = item != null, data = item });
+            bool result = await _brandService.Delete(id);
+            return Json(new { success = result ? "Xóa thương hiệu thành công." : "Xóa thương hiệu thất bại.", id });
         }
     }
 }

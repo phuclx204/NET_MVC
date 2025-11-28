@@ -60,7 +60,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="~/js/site.js"></script>
-    <script>
+<script>
         $(document).ready(function() {
             $("#loginForm").on("submit", function(event) {
                 event.preventDefault();
@@ -88,8 +88,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(loginData),
                     success: function(response) {
-                        if (response) {
-                            Swal.fire({
+                         Swal.fire({
                                 icon: 'success',
                                 title: 'Đăng nhập thành công!',
                                 text: 'Bạn sẽ được chuyển hướng đến trang quản trị.',
@@ -98,10 +97,6 @@
                             }).then(() => {
                                 window.location.href = '/home';
                             });
-
-                        } else {
-                             handleLoginError('Lỗi không xác định từ máy chủ.');
-                        }
                     },
 
                     error: function(xhr, status, error) {
@@ -117,14 +112,13 @@
                 });
             });
 
-            function handleLoginError(message) {
-                 Swal.fire({
-                    icon: 'error',
-                    title: 'Đăng nhập thất bại',
-                    text: message,
-                    confirmButtonText: 'Thử lại'
-                });
-            }
+           function handleLoginError(message) {
+            toastr.error(message, 'Đăng nhập thất bại', {
+                timeOut: 4000,
+                closeButton: true,
+                progressBar: true
+            });
+        }
 
         });
 </script>
