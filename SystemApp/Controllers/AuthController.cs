@@ -48,18 +48,18 @@ namespace SystemApp.Controllers
             Response.Cookies.Append("jwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(10)
             });
-            return Ok(new { token });
+            return Ok(new { messsage = "Đăng nhập thành công" });
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid input");
+                return BadRequest(ModelState);
 
             bool success = await _accountService.Register(dto);
 

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 namespace Catalog.Controllers
 {
     [Authorize]
-
     [Route("color")]
     public class ColorController : Controller
     {
@@ -22,24 +21,17 @@ namespace Catalog.Controllers
             _colorService = colorService;
         }
 
+        [HttpGet("")]
         public IActionResult Index()
         {
             return View();
         }
 
-        [HttpGet("form")]
-        public IActionResult Form(long id = 0)
-        {
-            ViewBag.Id = id;
-            return View("Save");
-        }
-
-
         [HttpGet("get-all")]
         public async Task<IActionResult> GetList()
         {
-            var colors = await _colorService.GetAll();
-            return Json(new { success = true, data = colors });
+            var colors = (await _colorService.GetAll()).AsQueryable();
+            return Json(colors);
         }
 
         [HttpPost("save")]
@@ -49,7 +41,7 @@ namespace Catalog.Controllers
             string message = "";
             try
             {
-                if (color.Id == 0)
+                if (color.Id == 0 || color.Id == null)
                 {
                     result = await _colorService.Create(color);
                     message = result ? "Tạo màu sắc thành công." : "Tạo màu sắc thất bại.";
@@ -65,29 +57,14 @@ namespace Catalog.Controllers
             {
                 message = ex.Message;
             }
-            return Json(new { success = result, message = message });
+            return Json(new { success = result, message, data = color });
         }
 
-        [HttpPost("delete/{id:long}")]
+        [HttpDelete("{id:long}")]
         public async Task<IActionResult> Delete(long id)
         {
-            var result = await _colorService.Delete(id);
-            return Json(new
-            {
-                success = result,
-                message = result ? "Xóa màu sắc thành công." : "Xóa thất bại"
-            });
-        }
-
-
-
-        [HttpGet("detail/{id}")]
-        public async Task<IActionResult> GetDetail(long id)
-        {
-            var item = await _colorService.GetById(id);
-            if (item == null) return NotFound(new { success = false, message = "Không tìm thấy dữ liệu" });
-
-            return Json(new { success = true, data = item });
+            bool result = await _colorService.Delete(id);
+            return Json(new { success = result, message = result ? "Xóa màu sắc thành công." : "Xóa thất bại", id });
         }
     }
 }

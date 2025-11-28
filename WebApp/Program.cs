@@ -68,8 +68,19 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("jwtToken"))
+            {
+                context.Token = context.Request.Cookies["jwtToken"];
+            }
+
+            return Task.CompletedTask;
+        },
+
         OnChallenge = context =>
         {
             context.HandleResponse();
@@ -78,6 +89,7 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
 
 var app = builder.Build();
 
