@@ -30,7 +30,7 @@ namespace Catalog.Controllers
         [HttpGet("get-all")]
         public async Task<IActionResult> GetList()
         {
-            var brands = await _brandService.GetAll();
+            var brands = (await _brandService.GetAll()).AsQueryable();
             return Json(brands);
         }
 
@@ -59,7 +59,7 @@ namespace Catalog.Controllers
             return Json(new { success = result, message, data = brand });
         }
 
-        [HttpPost("delete/{id:long}")]
+        [HttpPost("{id:long}")]
         public async Task<IActionResult> Delete(long id)
         {
             bool result = await _brandService.Delete(id);

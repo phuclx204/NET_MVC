@@ -7,21 +7,23 @@ GO
 CREATE TABLE users (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(100),
-	avatar NVARCHAR(255),
+    avatar NVARCHAR(255),
     email NVARCHAR(100) UNIQUE,
     phone NVARCHAR(15),
     password NVARCHAR(255),
     status TINYINT DEFAULT 1,
-	created_by BIGINT,
-	updated_by BIGINT,
+    created_by BIGINT,
+    updated_by BIGINT,
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME
+    updated_at DATETIME,
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE roles (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(50),
-    description NVARCHAR(255)
+    description NVARCHAR(255),
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE role_user (
@@ -35,98 +37,106 @@ CREATE TABLE role_user (
 CREATE TABLE customers (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(100),
-	gender TINYINT, 
-	dob DATE,
-	tier NVARCHAR(20),
+    gender TINYINT,
+    dob DATE,
+    tier NVARCHAR(20),
     phone NVARCHAR(15),
     email NVARCHAR(100),
     address NVARCHAR(255),
-	note NVARCHAR(255),
+    note NVARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME
+    updated_at DATETIME,
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE suppliers (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(150),
-	tax_code NVARCHAR(255),
-	contact_person NVARCHAR(100),
+    tax_code NVARCHAR(255),
+    contact_person NVARCHAR(100),
     phone NVARCHAR(15),
     email NVARCHAR(100),
     address NVARCHAR(255),
-	note NVARCHAR(255)
+    note NVARCHAR(255),
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE categories (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(100),
-	slug NVARCHAR(255),
-	sort_order INT,
+    slug NVARCHAR(255),
+    sort_order INT,
     parent_id BIGINT NULL,
     status TINYINT DEFAULT 1,
-	created_at DATETIME DEFAULT GETDATE(),
+    created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (parent_id) REFERENCES categories(id)
 );
 
 CREATE TABLE brands (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(100),
-	country NVARCHAR(50),
-	logo NVARCHAR(255),
+    country NVARCHAR(50),
+    logo NVARCHAR(255),
     status TINYINT DEFAULT 1,
-	created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME,
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE colors (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(50),
-    code NVARCHAR(10),  -- #FF0000
+    code NVARCHAR(10),
     status TINYINT DEFAULT 1,
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME
+    updated_at DATETIME,
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE sizes (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
-    name NVARCHAR(20), -- S, M, L, XL, ...
+    name NVARCHAR(20),
     status TINYINT DEFAULT 1,
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME
+    updated_at DATETIME,
+    deleted_at DATETIME NULL
 );
 
 CREATE TABLE products (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(150),
-	thumbnail NVARCHAR(255),
-	weight DECIMAL(10,2),
-	material NVARCHAR(100),
-	origin NVARCHAR(100),
+    thumbnail NVARCHAR(255),
+    weight DECIMAL(10,2),
+    material NVARCHAR(100),
+    origin NVARCHAR(100),
     category_id BIGINT,
     brand_id BIGINT,
     description NVARCHAR(MAX),
     status TINYINT DEFAULT 1,
-	created_at DATETIME DEFAULT GETDATE(),
+    created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (brand_id) REFERENCES brands(id)
 );
 
 CREATE TABLE product_details (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
-	barcode NVARCHAR(50),
+    barcode NVARCHAR(50),
     product_id BIGINT,
     size_id BIGINT,
     color_id BIGINT,
     price DECIMAL(12,2),
     cost_price DECIMAL(12,2),
-	min_stock INT,
+    min_stock INT,
     stock INT DEFAULT 0,
     sku NVARCHAR(50),
     status TINYINT DEFAULT 1,
-	created_at DATETIME DEFAULT GETDATE(),
+    created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (size_id) REFERENCES sizes(id),
     FOREIGN KEY (color_id) REFERENCES colors(id)
@@ -134,13 +144,14 @@ CREATE TABLE product_details (
 
 CREATE TABLE stock_in (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
-	code NVARCHAR(50),
+    code NVARCHAR(50),
     supplier_id BIGINT,
     user_id BIGINT,
     total_amount DECIMAL(12,2),
-	note NVARCHAR(255),
+    note NVARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
@@ -152,6 +163,7 @@ CREATE TABLE stock_in_detail (
     quantity INT,
     price DECIMAL(12,2),
     total DECIMAL(12,2),
+    deleted_at DATETIME NULL,
     FOREIGN KEY (stock_in_id) REFERENCES stock_in(id),
     FOREIGN KEY (product_detail_id) REFERENCES product_details(id)
 );
@@ -159,18 +171,19 @@ CREATE TABLE stock_in_detail (
 CREATE TABLE vouchers (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     code NVARCHAR(50),
-	user_id BIGINT,
-	usage_limit INT, --so lan su dung
-	used_count INT, --so lan da dung
+    user_id BIGINT,
+    usage_limit INT,
+    used_count INT,
     description NVARCHAR(255),
-    discount_type NVARCHAR(10), -- tongtien / phantram
+    discount_type NVARCHAR(10),
     discount_value DECIMAL(12,2),
-	max_discount DECIMAL(12,2),
+    max_discount DECIMAL(12,2),
     min_order DECIMAL(12,2),
     start_date DATETIME,
     end_date DATETIME,
     status TINYINT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE orders (
@@ -178,16 +191,17 @@ CREATE TABLE orders (
     customer_id BIGINT,
     user_id BIGINT,
     voucher_id BIGINT NULL,
-	code NVARCHAR(50),
+    code NVARCHAR(50),
     total_amount DECIMAL(12,2),
     discount_amount DECIMAL(12,2),
     final_amount DECIMAL(12,2),
-	payment_status NVARCHAR(30),
-	shipping_fee DECIMAL(12,2),
+    payment_status NVARCHAR(30),
+    shipping_fee DECIMAL(12,2),
     status NVARCHAR(30),
-	note NVARCHAR(255),
+    note NVARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
-	updated_at DATETIME,
+    updated_at DATETIME,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (voucher_id) REFERENCES vouchers(id)
@@ -197,66 +211,76 @@ CREATE TABLE order_items (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     order_id BIGINT,
     product_detail_id BIGINT,
-	discount DECIMAL(12,2),
+    discount DECIMAL(12,2),
     quantity INT,
     price DECIMAL(12,2),
     total DECIMAL(12,2),
+    deleted_at DATETIME NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_detail_id) REFERENCES product_details(id)
 );
+
 CREATE TABLE carts (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     customer_id BIGINT,
     total_amount DECIMAL(12,2) DEFAULT 0,
-	item_count INT DEFAULT 0,
-	cart_status NVARCHAR(20) DEFAULT 'PENDING', --PENDING/CHECKOUT/ABANDONED
+    item_count INT DEFAULT 0,
+    cart_status NVARCHAR(20) DEFAULT 'PENDING',
     created_at DATETIME DEFAULT GETDATE(),
-	updated_at DATETIME,
+    updated_at DATETIME,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
+
 CREATE TABLE cart_items (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     cart_id BIGINT,
-	product_detai_id BIGINT,
-	quantity INT DEFAULT 1,
-	price DECIMAL(12,2),
+    product_detai_id BIGINT,
+    quantity INT DEFAULT 1,
+    price DECIMAL(12,2),
     total DECIMAL(12,2),
     created_at DATETIME DEFAULT GETDATE(),
-	updated_at DATETIME,
-	CONSTRAINT uq_cart_item UNIQUE (cart_id, product_detai_id),
+    updated_at DATETIME,
+    deleted_at DATETIME NULL,
+    CONSTRAINT uq_cart_item UNIQUE (cart_id, product_detai_id),
     FOREIGN KEY (cart_id) REFERENCES carts(id),
     FOREIGN KEY (product_detai_id) REFERENCES product_details(id)
 );
 
 CREATE TABLE payments (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
-	transaction_id NVARCHAR(100),
+    transaction_id NVARCHAR(100),
     order_id BIGINT,
-    method NVARCHAR(50), -- cash, card, momo
+    method NVARCHAR(50),
     amount DECIMAL(12,2),
-	status TINYINT,
+    status TINYINT,
     created_at DATETIME DEFAULT GETDATE(),
+    deleted_at DATETIME NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id)
 );
+
 CREATE TABLE product_images (
     id BIGINT IDENTITY PRIMARY KEY,
-	product_id BIGINT,
+    product_id BIGINT,
     url NVARCHAR(255),
     amount DECIMAL(12,2),
-	is_thumbnail BIT DEFAULT 0,
+    is_thumbnail BIT DEFAULT 0,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
 CREATE TABLE audit_log (
     id BIGINT IDENTITY PRIMARY KEY,
-	user_id BIGINT,
+    user_id BIGINT,
     action NVARCHAR(255),
-    created_at DATETIME DEFAULT GETDATE(),	
+    created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 --insert db fake
 INSERT INTO roles (name, description)
 VALUES
+	('CUSTOMER', N'Khách hàng'),
     ('ADMIN', N'Quyền quản trị hệ thống'),
     ('SALES', N'Nhân viên bán hàng'),
     ('MANAGER', N'Quản lý cửa hàng'),
@@ -286,12 +310,87 @@ INSERT INTO suppliers (name, phone, email, address) VALUES
 (N'Công ty May An Phước', '0909000003', 'anphuoc@mail.com', 'HN'),
 (N'Công ty Sợi T&T', '0909000004', 'tt@mail.com', N'Đồng Nai'),
 (N'Công ty Dệt May 7', '0909000005', 'may7@mail.com', N'Cần Thơ');
-INSERT INTO categories (name, parent_id, status) VALUES
-(N'Nam', NULL, 1),
-(N'Nữ', NULL, 1),
-(N'Áo Nam', 1, 1),
-(N'Quần Nam', 1, 1),
-(N'Váy Nữ', 2, 1);
+
+
+---------------------------------------------------
+-- LEVEL 1: Danh mục gốc
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Nam', NULL, 1),           -- id = 1
+(N'Nữ', NULL, 1),            -- id = 2
+(N'Trẻ Em', NULL, 1),        -- id = 3
+(N'Người Lớn Tuổi', NULL, 1); -- id = 4
+
+
+---------------------------------------------------
+-- LEVEL 2: Danh mục con của Nam (parent_id = 1)
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Áo Nam', 1, 1),           -- id = 5
+(N'Quần Nam', 1, 1),         -- id = 6
+(N'Đồ Thể Thao Nam', 1, 1),  -- id = 7
+(N'Đồ Lót Nam', 1, 1),       -- id = 8
+(N'Phụ Kiện Nam', 1, 1);     -- id = 9
+
+
+---------------------------------------------------
+-- LEVEL 2: Danh mục con của Nữ (parent_id = 2)
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Áo Nữ', 2, 1),            -- id = 10
+(N'Quần Nữ', 2, 1),          -- id = 11
+(N'Váy Nữ', 2, 1),           -- id = 12
+(N'Đầm Nữ', 2, 1),           -- id = 13
+(N'Phụ Kiện Nữ', 2, 1);      -- id = 14
+
+
+---------------------------------------------------
+-- LEVEL 2: Danh mục con của Trẻ Em (parent_id = 3)
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Áo Trẻ Em', 3, 1),        -- id = 15
+(N'Quần Trẻ Em', 3, 1),      -- id = 16
+(N'Đồ Bộ Trẻ Em', 3, 1),     -- id = 17
+(N'Phụ Kiện Trẻ Em', 3, 1);  -- id = 18
+
+
+---------------------------------------------------
+-- LEVEL 2: Danh mục con của Người Lớn Tuổi (parent_id = 4)
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Áo Người Lớn Tuổi', 4, 1),       -- id = 19
+(N'Quần Người Lớn Tuổi', 4, 1),     -- id = 20
+(N'Đồ Ở Nhà Người Lớn Tuổi', 4, 1), -- id = 21
+(N'Phụ Kiện Người Lớn Tuổi', 4, 1); -- id = 22
+
+
+---------------------------------------------------
+-- LEVEL 3: Chi tiết hơn – Áo Nam (parent_id = 5)
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Áo Thun Nam', 5, 1),
+(N'Áo Sơ Mi Nam', 5, 1),
+(N'Áo Khoác Nam', 5, 1),
+(N'Áo Polo Nam', 5, 1);
+
+
+---------------------------------------------------
+-- LEVEL 3: Chi tiết hơn – Áo Nữ (parent_id = 10)
+---------------------------------------------------
+INSERT INTO categories (name, parent_id, status)
+VALUES
+(N'Áo Thun Nữ', 10, 1),
+(N'Áo Sơ Mi Nữ', 10, 1),
+(N'Áo Croptop', 10, 1),
+(N'Áo Khoác Nữ', 10, 1);
+
+
 INSERT INTO brands (name, status) VALUES
 ('Nike', 1),
 ('Adidas', 1),
@@ -358,4 +457,6 @@ INSERT INTO payments (order_id, method, amount) VALUES
 (3,'momo',300000),
 (4,'cash',420000),
 (5,'card',250000);
+
+
 

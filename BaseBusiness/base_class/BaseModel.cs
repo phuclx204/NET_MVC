@@ -12,6 +12,7 @@ namespace BaseBusiness.base_class
         public long Id { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public int Status { get; set; } = 1;
     }
     public abstract class FullAuditModel : BaseModel

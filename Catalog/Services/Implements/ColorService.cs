@@ -38,7 +38,6 @@ namespace Modules.Catalog.Services
 
         public async Task<bool> Create(ColorModel color)
         {
-            // Dùng @Name(sql parameter) để tránh SQL Injection
             string sql = @"INSERT INTO colors (name, code, status, created_at) 
                            VALUES (@Name, @Code, 1, GETDATE())";
 
