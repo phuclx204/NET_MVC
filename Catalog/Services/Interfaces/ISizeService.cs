@@ -10,6 +10,8 @@ namespace Catalog.Services.Interfaces
     public interface ISizeService
     {
         Task<List<SizeModel>> GetAll();
+        Task<List<SizeModel>> GetAllByDeleteNull();
+        Task<List<SizeModel>> GetAllByDelete();
         Task<SizeModel> GetById(long id);
         Task<bool> Create(SizeModel model);
         Task<bool> Update(SizeModel model);
